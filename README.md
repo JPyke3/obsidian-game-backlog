@@ -1,9 +1,9 @@
 # Obsidian Game Backlog
 
-[![CI](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/ci.yml/badge.svg)](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/ci.yml)
-[![Lint](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/lint.yml/badge.svg)](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/lint.yml)
-[![Test](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/test.yml/badge.svg)](https://github.com/jacobpyke/obsidian-game-backlog/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/jacobpyke/obsidian-game-backlog/graph/badge.svg)](https://codecov.io/gh/jacobpyke/obsidian-game-backlog)
+[![CI](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/ci.yml/badge.svg)](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/ci.yml)
+[![Lint](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/lint.yml/badge.svg)](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/lint.yml)
+[![Test](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/test.yml/badge.svg)](https://github.com/JPyke3/obsidian-game-backlog/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/JPyke3/obsidian-game-backlog/graph/badge.svg)](https://codecov.io/gh/JPyke3/obsidian-game-backlog)
 
 A video game backlog manager plugin for [Obsidian](https://obsidian.md) with automatic metadata fetching from IGDB, HowLongToBeat, and SteamGridDB.
 
