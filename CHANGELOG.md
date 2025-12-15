@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2023-11-15
+## [1.0.0] - 2025-12-15
 
 ### Added
 
@@ -28,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update game status from command palette
 - Automatic cover art fetching
 - Game efficiency scoring
-- Multi-platform support
 
 ### Fixed
 
