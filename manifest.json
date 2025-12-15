@@ -1,7 +1,7 @@
 {
   "id": "game-backlog",
   "name": "Game Backlog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minAppVersion": "1.10.6",
   "description": "Manage your video game backlog with automatic metadata from IGDB, HLTB, and SteamGridDB.",
   "author": "Jacob Pyke",

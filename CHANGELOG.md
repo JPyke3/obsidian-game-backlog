@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated minimum Obsidian app version from 1.0.0 to 1.10.6
 - Changed author URL from GitHub to personal website (pyk.ee)
 
+## [1.0.1] - 2025-12-15
+
 ### Fixed
 
 - Removed non-existent `styles.css` from release workflow to fix build failures
