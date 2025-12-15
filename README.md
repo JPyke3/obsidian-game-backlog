@@ -95,6 +95,55 @@ The plugin requires API credentials to fetch game data:
 2. Open the command palette
 3. Run "Update current game status"
 
+## Troubleshooting
+
+### API Issues
+
+If you encounter API-related errors:
+
+1. **IGDB/Twitch API**:
+   - Ensure your Client ID and Client Secret are correct
+   - Check that your Twitch application is approved
+   - Verify you haven't exceeded API rate limits
+
+2. **SteamGridDB API**:
+   - Ensure your API key is valid
+   - Check that you haven't exceeded the free tier limits
+
+3. **General API Issues**:
+   - Check your internet connection
+   - Try restarting Obsidian
+   - Verify the plugin has the latest version
+
+### Dashboard Not Working
+
+If the dashboard doesn't display properly:
+
+1. Ensure Dataview plugin is installed and enabled
+2. Check that you have at least one game in your backlog
+3. Verify the dashboard note exists in your vault
+4. Try running "Open game backlog dashboard" again
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Bug Reports**: Open an issue with detailed reproduction steps
+2. **Feature Requests**: Open an issue describing the desired functionality
+3. **Pull Requests**:
+   - Fork the repository
+   - Create a feature branch
+   - Make your changes
+   - Submit a pull request with clear description
+
+## Support
+
+For support, please:
+
+1. Check the [GitHub Issues](https://github.com/jacobpyke/obsidian-game-backlog/issues) for known problems
+2. Open a new issue if you encounter a bug
+3. Include as much detail as possible (screenshots, error messages, steps to reproduce)
+
 ## Game Note Structure
 
 Each game creates a markdown note with:
@@ -125,4 +174,4 @@ npm run build
 
 ## License
 
-GPL 3.0
+GPL-3.0 License - See [LICENSE](LICENSE) for details.

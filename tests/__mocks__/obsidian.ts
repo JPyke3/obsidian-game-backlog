@@ -46,16 +46,29 @@ export class Plugin {
   registerEvent(eventRef: EventRef): void {}
 }
 
+// Mock FileManager
+export class FileManager {
+  processFrontMatter = vi.fn().mockImplementation(
+    async (file: TFile, fn: (frontmatter: any) => void) => {
+      const frontmatter: any = {};
+      fn(frontmatter);
+      return Promise.resolve();
+    }
+  );
+}
+
 // Mock App
 export class App {
   vault: Vault;
   workspace: Workspace;
   metadataCache: MetadataCache;
+  fileManager: FileManager;
 
   constructor() {
     this.vault = new Vault();
     this.workspace = new Workspace();
     this.metadataCache = new MetadataCache();
+    this.fileManager = new FileManager();
   }
 }
 
@@ -148,6 +161,10 @@ export class Setting {
   }
 
   setDesc(desc: string | DocumentFragment): this {
+    return this;
+  }
+
+  setHeading(): this {
     return this;
   }
 

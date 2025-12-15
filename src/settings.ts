@@ -49,10 +49,8 @@ export class GameBacklogSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: 'Game Backlog Settings' });
-
     // API Keys Section
-    containerEl.createEl('h3', { text: 'API Credentials' });
+    new Setting(containerEl).setName('API credentials').setHeading();
 
     new Setting(containerEl)
       .setName('Twitch Client ID')
@@ -112,7 +110,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
       );
 
     // Defaults Section
-    containerEl.createEl('h3', { text: 'Defaults' });
+    new Setting(containerEl).setName('Defaults').setHeading();
 
     new Setting(containerEl)
       .setName('Default Platform')

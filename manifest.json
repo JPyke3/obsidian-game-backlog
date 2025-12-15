@@ -3,7 +3,7 @@
   "name": "Game Backlog",
   "version": "1.0.0",
   "minAppVersion": "1.0.0",
-  "description": "Manage your video game backlog with automatic metadata from RAWG, HLTB, and SteamGridDB",
+  "description": "Manage your video game backlog with automatic metadata from IGDB, HLTB, and SteamGridDB.",
   "author": "Jacob Pyke",
   "authorUrl": "https://github.com/jacobpyke",
   "isDesktopOnly": false

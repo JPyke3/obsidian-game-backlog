@@ -51,7 +51,6 @@ export class HltbClient {
 
       const data = response.json;
       if (data?.token) {
-        console.log('HLTB: Auth token acquired');
         return data.token;
       }
     } catch (error) {

@@ -240,11 +240,9 @@ SORT file.mtime DESC
 
   private async updateGameStatus(filePath: string) {
     const file = this.app.vault.getAbstractFileByPath(filePath);
-    if (!file) return;
+    if (!file || !(file instanceof TFile)) return;
 
-    const content = await this.app.vault.read(file as TFile);
-    const cache = this.app.metadataCache.getFileCache(file as TFile);
-
+    const cache = this.app.metadataCache.getFileCache(file);
     if (!cache?.frontmatter) return;
 
     const initialPriority = typeof cache.frontmatter.priority === 'string' ? cache.frontmatter.priority : 'Must Play';
@@ -268,7 +266,7 @@ SORT file.mtime DESC
 
       onOpen() {
         const { contentEl } = this;
-        contentEl.createEl('h2', { text: 'Update Game Status' });
+        contentEl.createEl('h2', { text: 'Update game status' });
 
         new Setting(contentEl).setName('Status').addDropdown((dropdown) => {
           const priorities = [
@@ -303,20 +301,20 @@ SORT file.mtime DESC
     }
 
     const modal = new StatusModal(this.app, initialPriority, async (priority) => {
-      // Update the frontmatter
-      const newContent = content.replace(
-        /priority: ".*?"/,
-        `priority: "${priority}"`
-      );
-      if (file instanceof TFile) {
-        await this.app.vault.modify(file, newContent);
-      }
+      // Update the frontmatter using processFrontMatter for atomic updates
+      await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+        frontmatter.priority = priority;
+      });
       new Notice(`Updated status to "${priority}"`);
     });
     modal.open();
   }
 
   onunload(): void {
-    // Plugin cleanup
+    // Clean up injected styles
+    const styleEl = document.getElementById('game-backlog-modal-styles');
+    if (styleEl) {
+      styleEl.remove();
+    }
   }
 }
