@@ -59,6 +59,21 @@ export class App {
   }
 }
 
+// Mock TFile
+export class TFile {
+  path: string = '';
+  basename: string = '';
+  extension: string = '';
+  parent: any = null;
+  
+  constructor() {
+    this.path = '';
+    this.basename = '';
+    this.extension = '';
+    this.parent = null;
+  }
+}
+
 // Mock Vault
 export class Vault {
   getAbstractFileByPath = vi.fn();
@@ -156,10 +171,16 @@ export class Setting {
 export class TextComponent {
   inputEl: HTMLInputElement;
   private value: string = '';
+  private onChangeCallback: ((value: string) => void) | null = null;
 
   constructor(containerEl: HTMLElement) {
     this.inputEl = createMockElement() as unknown as HTMLInputElement;
     this.inputEl.type = 'text';
+    this.inputEl.dispatchEvent = vi.fn().mockImplementation((event: Event) => {
+      if (event.type === 'input' && this.onChangeCallback) {
+        this.onChangeCallback(this.value);
+      }
+    });
   }
 
   setPlaceholder(placeholder: string): this {
@@ -176,7 +197,17 @@ export class TextComponent {
   }
 
   onChange(callback: (value: string) => void): this {
+    this.onChangeCallback = callback;
     return this;
+  }
+
+  trigger(eventType: string, data?: any): void {
+    if (eventType === 'input' && data?.target?.value !== undefined) {
+      this.value = data.target.value;
+      if (this.onChangeCallback) {
+        this.onChangeCallback(this.value);
+      }
+    }
   }
 }
 
@@ -184,9 +215,11 @@ export class TextComponent {
 export class DropdownComponent {
   selectEl: HTMLSelectElement;
   private value: string = '';
+  private onChangeCallback: ((value: string) => void) | null = null;
 
   constructor(containerEl: HTMLElement) {
     this.selectEl = createMockElement() as unknown as HTMLSelectElement;
+    this.selectEl.dispatchEvent = vi.fn();
   }
 
   addOption(value: string, display: string): this {
@@ -203,7 +236,17 @@ export class DropdownComponent {
   }
 
   onChange(callback: (value: string) => void): this {
+    this.onChangeCallback = callback;
     return this;
+  }
+
+  trigger(eventType: string, data?: any): void {
+    if (eventType === 'change' && data?.target?.value !== undefined) {
+      this.value = data.target.value;
+      if (this.onChangeCallback) {
+        this.onChangeCallback(this.value);
+      }
+    }
   }
 }
 
@@ -278,7 +321,7 @@ function createMockElement(): HTMLElement {
       add: vi.fn(),
       remove: vi.fn(),
       toggle: vi.fn(),
-      contains: vi.fn(),
+      contains: vi.fn().mockReturnValue(false),
     },
     getAttribute: vi.fn(),
     setAttribute: vi.fn(),
@@ -288,7 +331,30 @@ function createMockElement(): HTMLElement {
     innerHTML: '',
     textContent: '',
     disabled: false,
+    children: [],
   };
+  
+  // Add DOM-like methods
+  el.hasClass = vi.fn().mockImplementation((cls: string) => {
+    return el.classList.contains(cls);
+  });
+  
+  el.find = vi.fn().mockImplementation((selector: string) => {
+    // Simple mock - return null for most selectors
+    if (selector === '.setting-item') {
+      return createMockElement();
+    }
+    return null;
+  });
+  
+  el.findAll = vi.fn().mockImplementation((selector: string) => {
+    // Return array of mock elements
+    if (selector === '.setting-item') {
+      return [createMockElement(), createMockElement(), createMockElement(), createMockElement(), createMockElement()];
+    }
+    return [];
+  });
+  
   // Use lazy evaluation to prevent infinite recursion
   el.createEl = vi.fn().mockImplementation(() => createMockElement());
   el.createDiv = vi.fn().mockImplementation(() => createMockElement());
