@@ -7,7 +7,7 @@ import GameBacklogPlugin from '../../main.ts';
 import { DEFAULT_SETTINGS } from '../../src/settings';
 import { generateGameNote, generateFileName } from '../../src/templates/gameNote';
 import type { GameData } from '../../src/ui/AddGameModal';
-import { App, Plugin, Notice, requestUrl } from '../__mocks__/obsidian';
+import { App, Plugin, Notice } from '../__mocks__/obsidian';
 
 describe('GameBacklogPlugin', () => {
   let plugin: GameBacklogPlugin;
@@ -33,7 +33,6 @@ describe('GameBacklogPlugin', () => {
     vi.resetAllMocks();
   });
 
-  const _mockRequestUrl = requestUrl;
 
   describe('constructor', () => {
     it('should create plugin instance', () => {

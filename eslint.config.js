@@ -9,7 +9,7 @@ import prettierConfig from 'eslint-config-prettier';
 export default [
   eslint.configs.recommended,
   {
-    files: ['src/**/*.ts', 'main.ts', 'tests/**/*.ts'],
+    files: ['src/**/*.ts', 'main.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -122,22 +122,50 @@ export default [
     },
   },
   {
-    files: ['**/*.test.ts', '**/*.spec.ts'],
-    rules: {
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
+    files: ['tests/**/*.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
     },
-  },
-  {
-    files: ['**/fixtures/**', '**/__mocks__/**'],
+    plugins: {
+      '@typescript-eslint': tseslint,
+      'unused-imports': unusedImportsPlugin,
+      jsdoc: jsdocPlugin,
+    },
     rules: {
-      'jsdoc/require-jsdoc': 'off',
+      ...tseslint.configs.recommended.rules,
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+      'jsdoc/require-jsdoc': 'off',
+      'jsdoc/require-description': 'off',
+      'jsdoc/require-param': 'off',
+      'jsdoc/require-returns': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+      'no-undef': 'off',
     },
   },
   {

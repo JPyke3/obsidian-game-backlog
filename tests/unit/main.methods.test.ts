@@ -264,11 +264,6 @@ Some content`);
       });
       await plugin.loadSettings();
       
-      // Mock the modal
-      const _mockModal = {
-        open: vi.fn()
-      };
-      
       // We can't easily test the modal creation, but we can verify it doesn't throw
       // Access private method via type assertion
       const openAddGameModal = (plugin as any).openAddGameModal.bind(plugin);
