@@ -147,7 +147,7 @@ describe('GameBacklogPlugin methods', () => {
       await openBacklogDashboard();
 
       expect(app.vault.create).toHaveBeenCalledWith('Video Game Backlog.md', expect.any(String));
-      expect(Notice).toHaveBeenCalledWith('Created Video Game Backlog dashboard');
+      expect(Notice).toHaveBeenCalledWith('Created video game backlog dashboard');
     });
 
     it('should open existing dashboard', async () => {
@@ -253,7 +253,7 @@ Some content`);
       openAddGameModal();
 
       expect(Notice).toHaveBeenCalledWith(
-        'Please configure your Twitch Client ID and Secret in the Game Backlog settings'
+        'Please configure your Twitch client ID and secret in settings'
       );
     });
 
@@ -265,7 +265,7 @@ Some content`);
       await plugin.loadSettings();
       
       // Mock the modal
-      const mockModal = {
+      const _mockModal = {
         open: vi.fn()
       };
       

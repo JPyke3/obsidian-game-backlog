@@ -9,7 +9,7 @@ import prettierConfig from 'eslint-config-prettier';
 export default [
   eslint.configs.recommended,
   {
-    files: ['src/**/*.ts', 'main.ts'],
+    files: ['src/**/*.ts', 'main.ts', 'tests/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

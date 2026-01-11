@@ -65,7 +65,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName('API credentials').setHeading();
 
     new Setting(containerEl)
-      .setName('Twitch Client ID')
+      .setName('Twitch client ID')
       .setDesc(
         createFragment((frag) => {
           frag.appendText('Create an app at ');
@@ -78,7 +78,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
       )
       .addText((text) =>
         text
-          .setPlaceholder('Enter your Twitch Client ID')
+          .setPlaceholder('Enter your Twitch client ID')
           .setValue(this.plugin.settings.twitchClientId)
           .onChange(async (value) => {
             this.plugin.settings.twitchClientId = value;
@@ -87,11 +87,11 @@ export class GameBacklogSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Twitch Client Secret')
-      .setDesc("Your Twitch application's Client Secret")
+      .setName('Twitch client secret')
+      .setDesc("Your Twitch application's client secret")
       .addText((text) => {
         text
-          .setPlaceholder('Enter your Twitch Client Secret')
+          .setPlaceholder('Enter your Twitch client secret')
           .setValue(this.plugin.settings.twitchClientSecret)
           .onChange(async (value) => {
             this.plugin.settings.twitchClientSecret = value;
@@ -101,7 +101,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('SteamGridDB API Key')
+      .setName('SteamGridDB API key')
       .setDesc(
         createFragment((frag) => {
           frag.appendText('Get your API key from ');
@@ -125,7 +125,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName('Defaults').setHeading();
 
     new Setting(containerEl)
-      .setName('Default Platform')
+      .setName('Default platform')
       .setDesc('The platform selected by default when adding a new game')
       .addDropdown((dropdown) => {
         PLATFORMS.forEach((platform) => {
@@ -140,7 +140,7 @@ export class GameBacklogSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Default Priority')
+      .setName('Default priority')
       .setDesc('The priority selected by default when adding a new game')
       .addDropdown((dropdown) => {
         PRIORITIES.forEach((priority) => {

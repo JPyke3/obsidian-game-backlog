@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 // Mock requestUrl for HTTP requests
 // Returns a mock function that can be configured in tests
-export const requestUrl = vi.fn().mockImplementation((options) => {
+export const requestUrl = vi.fn().mockImplementation((_options) => {
   // Default implementation returns empty response
   // Tests should override with mockResolvedValueOnce
   return Promise.resolve({
@@ -39,9 +39,9 @@ export class Plugin {
     return command;
   }
 
-  addSettingTab(tab: PluginSettingTab): void {}
+  addSettingTab(_tab: PluginSettingTab): void {}
 
-  registerEvent(eventRef: EventRef): void {}
+  registerEvent(_eventRef: EventRef): void {}
 }
 
 // Mock FileManager
@@ -146,7 +146,7 @@ export class Setting {
   descEl: HTMLElement;
   controlEl: HTMLElement;
 
-  constructor(containerEl: HTMLElement) {
+  constructor(_containerEl: HTMLElement) {
     this.settingEl = createMockElement();
     this.infoEl = createMockElement();
     this.nameEl = createMockElement();
@@ -154,11 +154,11 @@ export class Setting {
     this.controlEl = createMockElement();
   }
 
-  setName(name: string): this {
+  setName(_name: string): this {
     return this;
   }
 
-  setDesc(desc: string | DocumentFragment): this {
+  setDesc(_desc: string | DocumentFragment): this {
     return this;
   }
 
@@ -188,7 +188,7 @@ export class TextComponent {
   private value: string = '';
   private onChangeCallback: ((value: string) => void) | null = null;
 
-  constructor(containerEl: HTMLElement) {
+  constructor(_containerEl: HTMLElement) {
     this.inputEl = createMockElement() as unknown as HTMLInputElement;
     this.inputEl.type = 'text';
     this.inputEl.dispatchEvent = vi.fn().mockImplementation((event: Event) => {
@@ -198,7 +198,7 @@ export class TextComponent {
     });
   }
 
-  setPlaceholder(placeholder: string): this {
+  setPlaceholder(_placeholder: string): this {
     return this;
   }
 
@@ -232,12 +232,12 @@ export class DropdownComponent {
   private value: string = '';
   private onChangeCallback: ((value: string) => void) | null = null;
 
-  constructor(containerEl: HTMLElement) {
+  constructor(_containerEl: HTMLElement) {
     this.selectEl = createMockElement() as unknown as HTMLSelectElement;
     this.selectEl.dispatchEvent = vi.fn();
   }
 
-  addOption(value: string, display: string): this {
+  addOption(_value: string, _display: string): this {
     return this;
   }
 
@@ -269,11 +269,11 @@ export class DropdownComponent {
 export class ButtonComponent {
   buttonEl: HTMLButtonElement;
 
-  constructor(containerEl: HTMLElement) {
+  constructor(_containerEl: HTMLElement) {
     this.buttonEl = createMockElement() as unknown as HTMLButtonElement;
   }
 
-  setButtonText(text: string): this {
+  setButtonText(_text: string): this {
     return this;
   }
 
@@ -281,7 +281,7 @@ export class ButtonComponent {
     return this;
   }
 
-  onClick(callback: () => void): this {
+  onClick(_callback: () => void): this {
     return this;
   }
 }

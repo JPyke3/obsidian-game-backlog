@@ -1,6 +1,9 @@
 import { vi } from 'vitest';
 
-// Create a function to make mock elements
+/**
+ * Creates a mock style element for testing.
+ * @returns Mock style element object
+ */
 function createMockStyleElement() {
   return {
     id: '',
@@ -15,6 +18,11 @@ function createMockStyleElement() {
   };
 }
 
+/**
+ * Creates a mock HTML element for testing.
+ * @param tag - The HTML tag name
+ * @returns Mock element object
+ */
 function createMockElement(tag: string) {
   return {
     tagName: tag.toUpperCase(),

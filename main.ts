@@ -34,8 +34,8 @@ export default class GameBacklogPlugin extends Plugin {
 
     // Add command to add a game
     this.addCommand({
-      id: 'add-game-to-backlog',
-      name: 'Add game to backlog',
+      id: 'add-game',
+      name: 'Add game',
       callback: () => {
         this.openAddGameModal();
       },
@@ -43,8 +43,8 @@ export default class GameBacklogPlugin extends Plugin {
 
     // Add command to open backlog dashboard
     this.addCommand({
-      id: 'open-game-backlog',
-      name: 'Open game backlog dashboard',
+      id: 'open-dashboard',
+      name: 'Open dashboard',
       callback: async () => {
         await this.openBacklogDashboard();
       },
@@ -52,8 +52,8 @@ export default class GameBacklogPlugin extends Plugin {
 
     // Add command to update game status
     this.addCommand({
-      id: 'update-game-status',
-      name: 'Update current game status',
+      id: 'update-status',
+      name: 'Update status',
       checkCallback: (checking: boolean) => {
         const file = this.app.workspace.getActiveFile();
         if (file) {
@@ -110,7 +110,7 @@ export default class GameBacklogPlugin extends Plugin {
   private openAddGameModal() {
     if (!this.settings.twitchClientId || !this.settings.twitchClientSecret) {
       new Notice(
-        'Please configure your Twitch Client ID and Secret in the Game Backlog settings'
+        'Please configure your Twitch client ID and secret in settings'
       );
       return;
     }
@@ -122,8 +122,8 @@ export default class GameBacklogPlugin extends Plugin {
       this.steamGridDbClient,
       this.settings.defaultPlatform as Platform,
       this.settings.defaultPriority as Priority,
-      async (data: GameData) => {
-        await this.createGameNote(data);
+      (data: GameData) => {
+        void this.createGameNote(data);
       }
     );
     modal.open();
@@ -171,7 +171,7 @@ export default class GameBacklogPlugin extends Plugin {
       // Create the dashboard if it doesn't exist
       const content = this.generateBacklogDashboard();
       file = await this.app.vault.create(dashboardPath, content);
-      new Notice('Created Video Game Backlog dashboard');
+      new Notice('Created video game backlog dashboard');
     }
 
     const leaf = this.app.workspace.getLeaf(false);
@@ -354,9 +354,9 @@ SORT file.mtime DESC
       }
     }
 
-    const modal = new StatusModal(this.app, initialPriority, async (priority) => {
+    const modal = new StatusModal(this.app, initialPriority, (priority) => {
       // Update the frontmatter using processFrontMatter for atomic updates
-      await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+      void this.app.fileManager.processFrontMatter(file, (frontmatter) => {
         frontmatter.priority = priority;
       });
       new Notice(`Updated status to "${priority}"`);
@@ -368,10 +368,6 @@ SORT file.mtime DESC
    * Cleans up resources when the plugin is unloaded.
    */
   onunload(): void {
-    // Clean up injected styles
-    const styleEl = document.getElementById('game-backlog-modal-styles');
-    if (styleEl) {
-      styleEl.remove();
-    }
+    // No cleanup needed - styles are now in styles.css
   }
 }

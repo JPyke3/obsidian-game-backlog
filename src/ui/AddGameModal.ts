@@ -96,7 +96,7 @@ export class AddGameModal extends Modal {
     contentEl.empty();
     contentEl.addClass('game-backlog-modal');
 
-    contentEl.createEl('h2', { text: 'Add Game to Backlog' });
+    contentEl.createEl('h2', { text: 'Add game to backlog' });
 
     // Search input
     new Setting(contentEl)
@@ -118,11 +118,10 @@ export class AddGameModal extends Modal {
       cls: 'game-search-results',
     });
 
-    // Selected game display
+    // Selected game display (hidden by default via CSS)
     this.selectedGameDisplay = contentEl.createDiv({
       cls: 'selected-game-display',
     });
-    this.selectedGameDisplay.style.display = 'none';
 
     // Platform dropdown
     new Setting(contentEl)
@@ -148,109 +147,20 @@ export class AddGameModal extends Modal {
         });
       });
 
-    // Loading indicator
+    // Loading indicator (hidden by default via CSS)
     this.loadingEl = contentEl.createDiv({ cls: 'game-loading' });
-    this.loadingEl.style.display = 'none';
     this.loadingEl.setText('Fetching game data...');
 
     // Submit button
     const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
     this.submitButton = buttonContainer.createEl('button', {
-      text: 'Add Game',
+      text: 'Add game',
       cls: 'mod-cta',
     });
     this.submitButton.disabled = true;
-    this.submitButton.addEventListener('click', () => this.handleSubmit());
-
-    // Add some basic styles
-    this.addStyles();
-  }
-
-  /**
-   * Adds CSS styles for the modal.
-   */
-  private addStyles() {
-    const styleId = 'game-backlog-modal-styles';
-    if (document.getElementById(styleId)) return;
-
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      .game-backlog-modal {
-        min-width: 400px;
-      }
-      .game-search-results {
-        max-height: 200px;
-        overflow-y: auto;
-        margin-bottom: 1rem;
-        border: 1px solid var(--background-modifier-border);
-        border-radius: 4px;
-      }
-      .game-search-results:empty {
-        display: none;
-      }
-      .game-search-result {
-        padding: 8px 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .game-search-result:hover {
-        background: var(--background-modifier-hover);
-      }
-      .game-search-result img {
-        width: 40px;
-        height: 56px;
-        object-fit: cover;
-        border-radius: 4px;
-      }
-      .game-search-result-info {
-        flex: 1;
-      }
-      .game-search-result-name {
-        font-weight: 500;
-      }
-      .game-search-result-meta {
-        font-size: 0.8em;
-        color: var(--text-muted);
-      }
-      .selected-game-display {
-        padding: 12px;
-        background: var(--background-secondary);
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .selected-game-display img {
-        width: 60px;
-        height: 84px;
-        object-fit: cover;
-        border-radius: 4px;
-      }
-      .selected-game-info h3 {
-        margin: 0 0 4px 0;
-      }
-      .selected-game-info p {
-        margin: 0;
-        font-size: 0.9em;
-        color: var(--text-muted);
-      }
-      .game-loading {
-        text-align: center;
-        padding: 1rem;
-        color: var(--text-muted);
-        font-style: italic;
-      }
-      .modal-button-container {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 1rem;
-      }
-    `;
-    document.head.appendChild(style);
+    this.submitButton.addEventListener('click', () => {
+      void this.handleSubmit();
+    });
   }
 
   /**
@@ -330,14 +240,14 @@ export class AddGameModal extends Modal {
    * Handles game selection from search results.
    * @param game - Selected IGDB game
    */
-  private async selectGame(game: IgdbGame) {
+  private selectGame(game: IgdbGame) {
     this.selectedGame = game;
     this.resultsContainer!.empty();
     this.searchInput!.setValue(game.name);
 
     // Update selected game display
     this.selectedGameDisplay!.empty();
-    this.selectedGameDisplay!.style.display = 'flex';
+    this.selectedGameDisplay!.addClass('is-visible');
 
     if (game.cover?.image_id) {
       const coverUrl = this.igdbClient.getCoverUrl(game.cover.image_id, 'cover_big');
@@ -375,7 +285,7 @@ export class AddGameModal extends Modal {
       return;
     }
 
-    this.loadingEl!.style.display = 'block';
+    this.loadingEl!.addClass('is-visible');
     this.submitButton!.disabled = true;
     this.submitButton!.setText('Adding...');
 
@@ -422,9 +332,9 @@ export class AddGameModal extends Modal {
     } catch (error) {
       console.error('Failed to add game:', error);
       new Notice('Failed to fetch game data. Please try again.');
-      this.loadingEl!.style.display = 'none';
+      this.loadingEl!.removeClass('is-visible');
       this.submitButton!.disabled = false;
-      this.submitButton!.setText('Add Game');
+      this.submitButton!.setText('Add game');
     }
   }
 

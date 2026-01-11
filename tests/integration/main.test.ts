@@ -33,7 +33,7 @@ describe('GameBacklogPlugin', () => {
     vi.resetAllMocks();
   });
 
-  const mockRequestUrl = requestUrl;
+  const _mockRequestUrl = requestUrl;
 
   describe('constructor', () => {
     it('should create plugin instance', () => {
@@ -235,7 +235,7 @@ describe('GameBacklogPlugin', () => {
   });
 
   describe('command registration', () => {
-    it('should register add-game-to-backlog command', async () => {
+    it('should register add-game command', async () => {
       plugin.loadData = vi.fn().mockResolvedValue({});
       const commands: any[] = [];
       plugin.addCommand = vi.fn((cmd) => {
@@ -245,12 +245,12 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const addGameCmd = commands.find((c) => c.id === 'add-game-to-backlog');
+      const addGameCmd = commands.find((c) => c.id === 'add-game');
       expect(addGameCmd).toBeDefined();
-      expect(addGameCmd.name).toBe('Add game to backlog');
+      expect(addGameCmd.name).toBe('Add game');
     });
 
-    it('should register open-game-backlog command', async () => {
+    it('should register open-dashboard command', async () => {
       plugin.loadData = vi.fn().mockResolvedValue({});
       const commands: any[] = [];
       plugin.addCommand = vi.fn((cmd) => {
@@ -260,12 +260,12 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const openBacklogCmd = commands.find((c) => c.id === 'open-game-backlog');
+      const openBacklogCmd = commands.find((c) => c.id === 'open-dashboard');
       expect(openBacklogCmd).toBeDefined();
-      expect(openBacklogCmd.name).toBe('Open game backlog dashboard');
+      expect(openBacklogCmd.name).toBe('Open dashboard');
     });
 
-    it('should register update-game-status command', async () => {
+    it('should register update-status command', async () => {
       plugin.loadData = vi.fn().mockResolvedValue({});
       const commands: any[] = [];
       plugin.addCommand = vi.fn((cmd) => {
@@ -275,9 +275,9 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const updateStatusCmd = commands.find((c) => c.id === 'update-game-status');
+      const updateStatusCmd = commands.find((c) => c.id === 'update-status');
       expect(updateStatusCmd).toBeDefined();
-      expect(updateStatusCmd.name).toBe('Update current game status');
+      expect(updateStatusCmd.name).toBe('Update status');
       expect(updateStatusCmd.checkCallback).toBeDefined();
     });
   });
@@ -293,11 +293,11 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const addGameCmd = commands.find((c) => c.id === 'add-game-to-backlog');
+      const addGameCmd = commands.find((c) => c.id === 'add-game');
       addGameCmd.callback();
 
       expect(Notice).toHaveBeenCalledWith(
-        'Please configure your Twitch Client ID and Secret in the Game Backlog settings'
+        'Please configure your Twitch client ID and secret in settings'
       );
     });
   });
@@ -314,7 +314,7 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const updateStatusCmd = commands.find((c) => c.id === 'update-game-status');
+      const updateStatusCmd = commands.find((c) => c.id === 'update-status');
       const result = updateStatusCmd.checkCallback(true);
 
       expect(result).toBe(false);
@@ -334,7 +334,7 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const updateStatusCmd = commands.find((c) => c.id === 'update-game-status');
+      const updateStatusCmd = commands.find((c) => c.id === 'update-status');
       const result = updateStatusCmd.checkCallback(true);
 
       expect(result).toBe(false);
@@ -354,7 +354,7 @@ describe('GameBacklogPlugin', () => {
 
       await plugin.onload();
 
-      const updateStatusCmd = commands.find((c) => c.id === 'update-game-status');
+      const updateStatusCmd = commands.find((c) => c.id === 'update-status');
       const result = updateStatusCmd.checkCallback(true);
 
       expect(result).toBe(true);

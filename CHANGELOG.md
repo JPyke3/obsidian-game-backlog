@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated minimum Obsidian app version from 1.0.0 to 1.10.6
 - Changed author URL from GitHub to personal website (pyk.ee)
+- Simplified command IDs to follow Obsidian conventions (removed plugin prefix)
+- Renamed command names to be shorter since plugin name is shown separately
+- Converted all UI text to sentence case for consistency
+
+### Fixed
+
+- Moved inline modal styles to dedicated `styles.css` file (Obsidian requirement)
+- Fixed promise handling in event callbacks to prevent void return warnings
+- Replaced direct style manipulation with CSS classes for better theming support
+- Removed unnecessary async keyword from synchronous method
 
 ## [1.0.1] - 2025-12-15
 
