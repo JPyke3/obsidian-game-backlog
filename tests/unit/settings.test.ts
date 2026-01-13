@@ -2,8 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 
 import {
   DEFAULT_SETTINGS,
-  PLATFORMS,
-  PRIORITIES,
   type GameBacklogSettings,
   type Platform,
   type Priority,
@@ -33,6 +31,26 @@ describe('settings', () => {
       expect(DEFAULT_SETTINGS.defaultPriority).toBe('Will Get Around To');
     });
 
+    it('should have efficiency enabled by default', () => {
+      expect(DEFAULT_SETTINGS.enableEfficiency).toBe(true);
+    });
+
+    it('should have correct dashboard path', () => {
+      expect(DEFAULT_SETTINGS.dashboardPath).toBe('Video Game Backlog.md');
+    });
+
+    it('should have upNextLimit of 5', () => {
+      expect(DEFAULT_SETTINGS.upNextLimit).toBe(5);
+    });
+
+    it('should have game and backlog as default tags', () => {
+      expect(DEFAULT_SETTINGS.noteTags).toEqual(['game', 'backlog']);
+    });
+
+    it('should have game emoji as default prefix', () => {
+      expect(DEFAULT_SETTINGS.noteEmojiPrefix).toBe('🎮');
+    });
+
     it('should match GameBacklogSettings interface structure', () => {
       const settings: GameBacklogSettings = DEFAULT_SETTINGS;
 
@@ -41,83 +59,89 @@ describe('settings', () => {
       expect(settings).toHaveProperty('steamGridDbApiKey');
       expect(settings).toHaveProperty('defaultPlatform');
       expect(settings).toHaveProperty('defaultPriority');
+      expect(settings).toHaveProperty('platforms');
+      expect(settings).toHaveProperty('priorities');
+      expect(settings).toHaveProperty('enableEfficiency');
+      expect(settings).toHaveProperty('dashboardPath');
+      expect(settings).toHaveProperty('upNextLimit');
+      expect(settings).toHaveProperty('noteTags');
+      expect(settings).toHaveProperty('noteEmojiPrefix');
     });
   });
 
-  describe('PLATFORMS', () => {
+  describe('DEFAULT_SETTINGS.platforms', () => {
     it('should contain exactly 4 platforms', () => {
-      expect(PLATFORMS).toHaveLength(4);
+      expect(DEFAULT_SETTINGS.platforms).toHaveLength(4);
     });
 
     it('should contain Full PC', () => {
-      expect(PLATFORMS).toContain('Full PC');
+      expect(DEFAULT_SETTINGS.platforms).toContain('Full PC');
     });
 
     it('should contain Gaming Laptop', () => {
-      expect(PLATFORMS).toContain('Gaming Laptop');
+      expect(DEFAULT_SETTINGS.platforms).toContain('Gaming Laptop');
     });
 
     it('should contain Steam Deck', () => {
-      expect(PLATFORMS).toContain('Steam Deck');
+      expect(DEFAULT_SETTINGS.platforms).toContain('Steam Deck');
     });
 
     it('should contain Android Handheld', () => {
-      expect(PLATFORMS).toContain('Android Handheld');
+      expect(DEFAULT_SETTINGS.platforms).toContain('Android Handheld');
     });
 
-    it('should be a readonly array', () => {
-      // TypeScript would prevent this at compile time, but we verify structure
-      expect(Array.isArray(PLATFORMS)).toBe(true);
+    it('should be an array', () => {
+      expect(Array.isArray(DEFAULT_SETTINGS.platforms)).toBe(true);
     });
 
     it('should have default platform as a valid option', () => {
-      expect(PLATFORMS).toContain(DEFAULT_SETTINGS.defaultPlatform);
+      expect(DEFAULT_SETTINGS.platforms).toContain(DEFAULT_SETTINGS.defaultPlatform);
     });
   });
 
-  describe('PRIORITIES', () => {
+  describe('DEFAULT_SETTINGS.priorities', () => {
     it('should contain exactly 5 priorities', () => {
-      expect(PRIORITIES).toHaveLength(5);
+      expect(DEFAULT_SETTINGS.priorities).toHaveLength(5);
     });
 
     it('should contain Must Play', () => {
-      expect(PRIORITIES).toContain('Must Play');
+      expect(DEFAULT_SETTINGS.priorities).toContain('Must Play');
     });
 
     it('should contain Will Get Around To', () => {
-      expect(PRIORITIES).toContain('Will Get Around To');
+      expect(DEFAULT_SETTINGS.priorities).toContain('Will Get Around To');
     });
 
     it('should contain Playing', () => {
-      expect(PRIORITIES).toContain('Playing');
+      expect(DEFAULT_SETTINGS.priorities).toContain('Playing');
     });
 
     it('should contain Completed', () => {
-      expect(PRIORITIES).toContain('Completed');
+      expect(DEFAULT_SETTINGS.priorities).toContain('Completed');
     });
 
     it('should contain Dropped', () => {
-      expect(PRIORITIES).toContain('Dropped');
+      expect(DEFAULT_SETTINGS.priorities).toContain('Dropped');
     });
 
-    it('should be a readonly array', () => {
-      expect(Array.isArray(PRIORITIES)).toBe(true);
+    it('should be an array', () => {
+      expect(Array.isArray(DEFAULT_SETTINGS.priorities)).toBe(true);
     });
 
     it('should have default priority as a valid option', () => {
-      expect(PRIORITIES).toContain(DEFAULT_SETTINGS.defaultPriority);
+      expect(DEFAULT_SETTINGS.priorities).toContain(DEFAULT_SETTINGS.defaultPriority);
     });
   });
 
   describe('Type compatibility', () => {
-    it('should allow Platform type assignment from PLATFORMS', () => {
-      const platform: Platform = PLATFORMS[0];
-      expect(PLATFORMS).toContain(platform);
+    it('should allow Platform type assignment from platforms array', () => {
+      const platform: Platform = DEFAULT_SETTINGS.platforms[0];
+      expect(DEFAULT_SETTINGS.platforms).toContain(platform);
     });
 
-    it('should allow Priority type assignment from PRIORITIES', () => {
-      const priority: Priority = PRIORITIES[0];
-      expect(PRIORITIES).toContain(priority);
+    it('should allow Priority type assignment from priorities array', () => {
+      const priority: Priority = DEFAULT_SETTINGS.priorities[0];
+      expect(DEFAULT_SETTINGS.priorities).toContain(priority);
     });
   });
 });

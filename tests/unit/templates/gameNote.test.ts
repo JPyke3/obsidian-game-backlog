@@ -3,44 +3,62 @@ import { describe, it, expect } from 'vitest';
 import {
   generateGameNote,
   generateFileName,
+  type NoteOptions,
 } from '../../../src/templates/gameNote';
 import type { GameData } from '../../../src/ui/AddGameModal';
+
+/** Default note options for testing */
+const defaultOptions: NoteOptions = {
+  enableEfficiency: true,
+  tags: ['game', 'backlog'],
+  emojiPrefix: '🎮',
+};
 
 describe('gameNote', () => {
   describe('generateFileName', () => {
     it('should generate filename with emoji prefix', () => {
-      const result = generateFileName('The Witcher 3');
+      const result = generateFileName('The Witcher 3', '🎮');
       expect(result).toBe('🎮 The Witcher 3.md');
     });
 
     it('should remove invalid filename characters', () => {
-      const result = generateFileName('Game: The "Test" Edition');
+      const result = generateFileName('Game: The "Test" Edition', '🎮');
       expect(result).toBe('🎮 Game The Test Edition.md');
     });
 
     it('should remove all invalid characters', () => {
-      const result = generateFileName('Test<>:/\\|?*Game');
+      const result = generateFileName('Test<>:/\\|?*Game', '🎮');
       expect(result).toBe('🎮 TestGame.md');
     });
 
     it('should normalize whitespace', () => {
-      const result = generateFileName('Game   With    Spaces');
+      const result = generateFileName('Game   With    Spaces', '🎮');
       expect(result).toBe('🎮 Game With Spaces.md');
     });
 
     it('should trim whitespace', () => {
-      const result = generateFileName('  Trimmed Title  ');
+      const result = generateFileName('  Trimmed Title  ', '🎮');
       expect(result).toBe('🎮 Trimmed Title.md');
     });
 
     it('should handle unicode characters', () => {
-      const result = generateFileName('Pokémon Legends: Arceus');
+      const result = generateFileName('Pokémon Legends: Arceus', '🎮');
       expect(result).toBe('🎮 Pokémon Legends Arceus.md');
     });
 
-    it('should handle empty string', () => {
-      const result = generateFileName('');
+    it('should handle empty string title', () => {
+      const result = generateFileName('', '🎮');
       expect(result).toBe('🎮 .md');
+    });
+
+    it('should handle empty emoji prefix', () => {
+      const result = generateFileName('The Witcher 3', '');
+      expect(result).toBe('The Witcher 3.md');
+    });
+
+    it('should handle custom emoji prefix', () => {
+      const result = generateFileName('Zelda', '🗡️');
+      expect(result).toBe('🗡️ Zelda.md');
     });
   });
 
@@ -60,7 +78,7 @@ describe('gameNote', () => {
     };
 
     it('should generate complete note with all data', () => {
-      const result = generateGameNote(completeGameData);
+      const result = generateGameNote(completeGameData, defaultOptions);
 
       // Check frontmatter
       expect(result).toContain('---');
@@ -107,7 +125,7 @@ describe('gameNote', () => {
         releaseYear: null,
       };
 
-      const result = generateGameNote(minimalData);
+      const result = generateGameNote(minimalData, defaultOptions);
 
       expect(result).toContain('title: "Minimal Game"');
       expect(result).toContain('platform: "Full PC"');
@@ -139,7 +157,7 @@ describe('gameNote', () => {
         releaseYear: null,
       };
 
-      const result = generateGameNote(dataWithQuotes);
+      const result = generateGameNote(dataWithQuotes, defaultOptions);
       expect(result).toContain('title: "Game \\"With\\" Quotes"');
     });
 
@@ -158,7 +176,7 @@ describe('gameNote', () => {
         releaseYear: 2023,
       };
 
-      const result = generateGameNote(dataWithGenreQuotes);
+      const result = generateGameNote(dataWithGenreQuotes, defaultOptions);
       expect(result).toContain('  - "Action \\"Test\\""');
     });
 
@@ -178,10 +196,10 @@ describe('gameNote', () => {
         releaseYear: 2022,
       };
 
-      const result = generateGameNote(dataWithLongDesc);
+      const result = generateGameNote(dataWithLongDesc, defaultOptions);
       expect(result).toContain('## Description');
       // Should be truncated to 800 chars + "..."
-      expect(result).toContain(`${'A'.repeat(800)  }...`);
+      expect(result).toContain(`${'A'.repeat(800)}...`);
     });
 
     it('should remove HTML entities from description', () => {
@@ -199,7 +217,7 @@ describe('gameNote', () => {
         releaseYear: 2021,
       };
 
-      const result = generateGameNote(dataWithHtmlEntities);
+      const result = generateGameNote(dataWithHtmlEntities, defaultOptions);
       expect(result).toContain('Test  description  with entities ');
       expect(result).not.toContain('&#');
     });
@@ -219,12 +237,12 @@ describe('gameNote', () => {
         releaseYear: null,
       };
 
-      const result = generateGameNote(data);
+      const result = generateGameNote(data, defaultOptions);
       // Check for ISO date format (YYYY-MM-DD)
       expect(result).toMatch(/added: \d{4}-\d{2}-\d{2}/);
     });
 
-    it('should handle rating without hours (no efficiency line)', () => {
+    it('should handle rating without hours (no efficiency in body)', () => {
       const data: GameData = {
         title: 'Rating Only',
         platform: 'Full PC',
@@ -239,7 +257,7 @@ describe('gameNote', () => {
         releaseYear: null,
       };
 
-      const result = generateGameNote(data);
+      const result = generateGameNote(data, defaultOptions);
       expect(result).toContain('**Rating:** 85');
       expect(result).not.toContain('**HLTB:**');
       expect(result).not.toContain('**Efficiency:**');
@@ -260,7 +278,7 @@ describe('gameNote', () => {
         releaseYear: null,
       };
 
-      const result = generateGameNote(data);
+      const result = generateGameNote(data, defaultOptions);
       expect(result).toContain('**HLTB:** 25h');
       expect(result).not.toContain('**Rating:**');
       expect(result).not.toContain('**Efficiency:**');
@@ -284,7 +302,7 @@ describe('gameNote', () => {
           releaseYear: null,
         };
 
-        const result = generateGameNote(data);
+        const result = generateGameNote(data, defaultOptions);
         expect(result).toContain(`priority: "${priority}"`);
       }
     });
@@ -307,10 +325,59 @@ describe('gameNote', () => {
           releaseYear: null,
         };
 
-        const result = generateGameNote(data);
+        const result = generateGameNote(data, defaultOptions);
         expect(result).toContain(`platform: "${platform}"`);
         expect(result).toContain(`**Platform:** ${platform}`);
       }
+    });
+
+    describe('with efficiency disabled', () => {
+      const noEfficiencyOptions: NoteOptions = {
+        enableEfficiency: false,
+        tags: ['game', 'backlog'],
+        emojiPrefix: '🎮',
+      };
+
+      it('should not include efficiency in frontmatter when disabled', () => {
+        const result = generateGameNote(completeGameData, noEfficiencyOptions);
+        expect(result).not.toContain('efficiency:');
+      });
+
+      it('should not include efficiency in body when disabled', () => {
+        const result = generateGameNote(completeGameData, noEfficiencyOptions);
+        expect(result).not.toContain('**Efficiency:**');
+      });
+    });
+
+    describe('with custom tags', () => {
+      const customTagOptions: NoteOptions = {
+        enableEfficiency: true,
+        tags: ['videogame', 'library', 'toplay'],
+        emojiPrefix: '🎮',
+      };
+
+      it('should use custom tags in frontmatter', () => {
+        const data: GameData = {
+          title: 'Custom Tags Game',
+          platform: 'Steam Deck',
+          priority: 'Must Play',
+          rating: null,
+          hltbHours: null,
+          efficiency: null,
+          coverUrl: null,
+          description: null,
+          igdbId: null,
+          genres: [],
+          releaseYear: null,
+        };
+
+        const result = generateGameNote(data, customTagOptions);
+        expect(result).toContain('  - videogame');
+        expect(result).toContain('  - library');
+        expect(result).toContain('  - toplay');
+        expect(result).not.toContain('  - game');
+        expect(result).not.toContain('  - backlog');
+      });
     });
   });
 });

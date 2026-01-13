@@ -5,7 +5,7 @@ vi.mock('obsidian', () => import('../__mocks__/obsidian'));
 
 import GameBacklogPlugin from '../../main.ts';
 import { DEFAULT_SETTINGS } from '../../src/settings';
-import { generateGameNote, generateFileName } from '../../src/templates/gameNote';
+import { generateGameNote, generateFileName, type NoteOptions } from '../../src/templates/gameNote';
 import type { GameData } from '../../src/ui/AddGameModal';
 import { App, Plugin, Notice } from '../__mocks__/obsidian';
 
@@ -199,8 +199,13 @@ describe('GameBacklogPlugin', () => {
         releaseYear: 2023,
       };
 
-      const noteContent = generateGameNote(gameData);
-      const fileName = generateFileName(gameData.title);
+      const noteOptions: NoteOptions = {
+        enableEfficiency: true,
+        tags: ['game', 'backlog'],
+        emojiPrefix: '🎮',
+      };
+      const noteContent = generateGameNote(gameData, noteOptions);
+      const fileName = generateFileName(gameData.title, noteOptions.emojiPrefix);
 
       expect(fileName).toBe('🎮 Test Game.md');
       expect(noteContent).toContain('title: "Test Game"');
@@ -226,7 +231,7 @@ describe('GameBacklogPlugin', () => {
         releaseYear: null,
       };
 
-      const fileName = generateFileName(gameData.title);
+      const fileName = generateFileName(gameData.title, '🎮');
 
       expect(fileName).not.toContain(':');
       expect(fileName).not.toContain('"');

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-14
+
+### Added
+
+- Configurable platform list with add/remove UI in settings
+- Configurable priority list with add/remove UI in settings
+- Toggle to enable/disable efficiency score calculation
+- Configurable dashboard file path and location
+- Configurable "Up Next" section limit for dashboard
+- Configurable tags for game notes (previously hardcoded to 'game' and 'backlog')
+- Configurable emoji prefix for game note filenames (can be disabled by leaving empty)
+- Settings migration and validation for backwards compatibility
+
+### Fixed
+
+- Priority list no longer duplicated between settings and StatusModal (was a maintenance issue)
+
+### Changed
+
+- Platform and priority options are now user-configurable instead of hardcoded
+- Dashboard generation now respects user settings for efficiency display and section limits
+
 ## [1.0.2] - 2026-01-14
 
 ### Changed

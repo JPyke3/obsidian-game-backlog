@@ -10,7 +10,7 @@ import {
 import { HltbClient, HltbResult } from '../api/hltb';
 import { IgdbClient, IgdbGame } from '../api/igdb';
 import { SteamGridDbClient } from '../api/steamgriddb';
-import { PLATFORMS, PRIORITIES, Platform, Priority } from '../settings';
+import type { GameBacklogSettings, Platform, Priority } from '../settings';
 
 export interface GameData {
   title: string;
@@ -32,6 +32,17 @@ interface SearchResult {
 }
 
 /**
+ * Callback interface for when a game is submitted.
+ */
+interface GameSubmitCallback {
+  /**
+   * Called when the user submits a game to be added.
+   * @param data - The game data to be created as a note
+   */
+  (data: GameData): void;
+}
+
+/**
  * Modal for adding games to the backlog.
  * Handles game search, selection, and data collection.
  */
@@ -39,10 +50,8 @@ export class AddGameModal extends Modal {
   private igdbClient: IgdbClient;
   private hltbClient: HltbClient;
   private steamGridDbClient: SteamGridDbClient;
-  /** Callback function for when game is added */
-  private onSubmit: (data: GameData) => void;
-  private defaultPlatform: Platform;
-  private defaultPriority: Priority;
+  private settings: GameBacklogSettings;
+  private onSubmit: GameSubmitCallback;
 
   private selectedGame: IgdbGame | null = null;
   private searchResults: SearchResult[] = [];
@@ -61,8 +70,7 @@ export class AddGameModal extends Modal {
    * @param igdbClient - IGDB API client
    * @param hltbClient - HLTB API client
    * @param steamGridDbClient - SteamGridDB API client
-   * @param defaultPlatform - Default platform selection
-   * @param defaultPriority - Default priority selection
+   * @param settings - Plugin settings containing platforms, priorities, and preferences
    * @param onSubmit - Callback when game is added
    */
   constructor(
@@ -70,21 +78,16 @@ export class AddGameModal extends Modal {
     igdbClient: IgdbClient,
     hltbClient: HltbClient,
     steamGridDbClient: SteamGridDbClient,
-    defaultPlatform: Platform,
-    defaultPriority: Priority,
-    onSubmit: /**
-     *
-     */
-    (data: GameData) => void
+    settings: GameBacklogSettings,
+    onSubmit: GameSubmitCallback
   ) {
     super(app);
     this.igdbClient = igdbClient;
     this.hltbClient = hltbClient;
     this.steamGridDbClient = steamGridDbClient;
-    this.defaultPlatform = defaultPlatform;
-    this.defaultPriority = defaultPriority;
-    this.platform = defaultPlatform;
-    this.priority = defaultPriority;
+    this.settings = settings;
+    this.platform = settings.defaultPlatform;
+    this.priority = settings.defaultPriority;
     this.onSubmit = onSubmit;
   }
 
@@ -128,10 +131,10 @@ export class AddGameModal extends Modal {
       .setName('Platform')
       .setDesc('Which platform will you play this on?')
       .addDropdown((dropdown) => {
-        PLATFORMS.forEach((p) => dropdown.addOption(p, p));
-        dropdown.setValue(this.defaultPlatform);
+        this.settings.platforms.forEach((p) => dropdown.addOption(p, p));
+        dropdown.setValue(this.settings.defaultPlatform);
         dropdown.onChange((value) => {
-          this.platform = value as Platform;
+          this.platform = value;
         });
       });
 
@@ -140,10 +143,10 @@ export class AddGameModal extends Modal {
       .setName('Priority')
       .setDesc('How likely are you to play this?')
       .addDropdown((dropdown) => {
-        PRIORITIES.forEach((p) => dropdown.addOption(p, p));
-        dropdown.setValue(this.defaultPriority);
+        this.settings.priorities.forEach((p) => dropdown.addOption(p, p));
+        dropdown.setValue(this.settings.defaultPriority);
         dropdown.onChange((value) => {
-          this.priority = value as Priority;
+          this.priority = value;
         });
       });
 
@@ -302,12 +305,14 @@ export class AddGameModal extends Modal {
         this.fetchCoverUrl(gameDetails),
       ]);
 
-      // Calculate efficiency score
+      // Calculate efficiency score (only if enabled in settings)
       const rating = gameDetails.aggregated_rating
         ? Math.round(gameDetails.aggregated_rating)
         : null;
       const hltbHours = hltbData?.mainStoryHours || null;
-      const efficiency = this.calculateEfficiency(rating, hltbHours);
+      const efficiency = this.settings.enableEfficiency
+        ? this.calculateEfficiency(rating, hltbHours)
+        : null;
 
       const releaseYear = gameDetails.first_release_date
         ? new Date(gameDetails.first_release_date * 1000).getFullYear()

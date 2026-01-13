@@ -1,22 +1,36 @@
 import { GameData } from '../ui/AddGameModal';
 
 /**
+ * Options for customizing game note generation.
+ */
+export interface NoteOptions {
+  /** Whether to include efficiency score in the note */
+  enableEfficiency: boolean;
+  /** Tags to add to the note frontmatter */
+  tags: string[];
+  /** Emoji prefix for the filename (empty string to disable) */
+  emojiPrefix: string;
+}
+
+/**
  * Generates a complete game note with frontmatter and body content.
  * @param data - Game data to include in the note
+ * @param options - Options for customizing the note output
  * @returns Complete markdown content for the game note
  */
-export function generateGameNote(data: GameData): string {
-  const frontmatter = generateFrontmatter(data);
-  const body = generateBody(data);
+export function generateGameNote(data: GameData, options: NoteOptions): string {
+  const frontmatter = generateFrontmatter(data, options);
+  const body = generateBody(data, options);
   return `${frontmatter}\n${body}`;
 }
 
 /**
  * Generates YAML frontmatter for the game note.
  * @param data - Game data to include in frontmatter
+ * @param options - Options for customizing the frontmatter output
  * @returns YAML frontmatter string
  */
-function generateFrontmatter(data: GameData): string {
+function generateFrontmatter(data: GameData, options: NoteOptions): string {
   const lines: string[] = ['---'];
 
   lines.push(`title: "${escapeYaml(data.title)}"`);
@@ -35,10 +49,13 @@ function generateFrontmatter(data: GameData): string {
     lines.push('hltb_hours: null');
   }
 
-  if (data.efficiency !== null) {
-    lines.push(`efficiency: ${data.efficiency}`);
-  } else {
-    lines.push('efficiency: null');
+  // Only include efficiency if enabled
+  if (options.enableEfficiency) {
+    if (data.efficiency !== null) {
+      lines.push(`efficiency: ${data.efficiency}`);
+    } else {
+      lines.push('efficiency: null');
+    }
   }
 
   if (data.coverUrl) {
@@ -61,9 +78,12 @@ function generateFrontmatter(data: GameData): string {
   }
 
   lines.push(`added: ${new Date().toISOString().split('T')[0]}`);
+
+  // Add user-configured tags
   lines.push('tags:');
-  lines.push('  - game');
-  lines.push('  - backlog');
+  options.tags.forEach((tag) => {
+    lines.push(`  - ${tag}`);
+  });
 
   lines.push('---');
 
@@ -73,9 +93,10 @@ function generateFrontmatter(data: GameData): string {
 /**
  * Generates the markdown body content for the game note.
  * @param data - Game data to include in the body
+ * @param options - Options for customizing the body output
  * @returns Markdown body content
  */
-function generateBody(data: GameData): string {
+function generateBody(data: GameData, options: NoteOptions): string {
   const sections: string[] = [];
 
   // Cover image
@@ -92,7 +113,8 @@ function generateBody(data: GameData): string {
   if (data.hltbHours !== null) {
     infoParts.push(`**HLTB:** ${data.hltbHours}h`);
   }
-  if (data.efficiency !== null) {
+  // Only include efficiency if enabled
+  if (options.enableEfficiency && data.efficiency !== null) {
     infoParts.push(`**Efficiency:** ${data.efficiency}`);
   }
   infoParts.push(`**Platform:** ${data.platform}`);
@@ -115,7 +137,7 @@ function generateBody(data: GameData): string {
     desc = desc.replace(/&#\d+;/g, '');
     // Limit to first 800 chars if very long
     if (desc.length > 800) {
-      desc = `${desc.substring(0, 800).trim()  }...`;
+      desc = `${desc.substring(0, 800).trim()}...`;
     }
     sections.push(desc);
     sections.push('');
@@ -141,14 +163,17 @@ function escapeYaml(str: string): string {
 /**
  * Generates a safe filename for the game note.
  * @param title - Game title
- * @returns Safe filename with game emoji prefix
+ * @param emojiPrefix - Emoji prefix for the filename (empty string to disable)
+ * @returns Safe filename with optional emoji prefix
  */
-export function generateFileName(title: string): string {
+export function generateFileName(title: string, emojiPrefix: string): string {
   // Sanitize the title for use as a filename
   const sanitized = title
     .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filename chars
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
 
-  return `🎮 ${sanitized}.md`;
+  // Add emoji prefix with space if provided, otherwise just use the title
+  const prefix = emojiPrefix ? `${emojiPrefix} ` : '';
+  return `${prefix}${sanitized}.md`;
 }

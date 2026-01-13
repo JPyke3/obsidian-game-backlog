@@ -4,9 +4,13 @@ import type { App } from 'obsidian';
 import { HltbClient } from './src/api/hltb';
 import { IgdbClient } from './src/api/igdb';
 import { SteamGridDbClient } from './src/api/steamgriddb';
-import type { GameBacklogSettings, Platform, Priority } from './src/settings';
+import type { GameBacklogSettings } from './src/settings';
 import { GameBacklogSettingTab, DEFAULT_SETTINGS } from './src/settings';
-import { generateGameNote, generateFileName } from './src/templates/gameNote';
+import {
+  generateGameNote,
+  generateFileName,
+  type NoteOptions,
+} from './src/templates/gameNote';
 import { AddGameModal, type GameData } from './src/ui/AddGameModal';
 
 // Declare global console for ESLint
@@ -90,9 +94,49 @@ export default class GameBacklogPlugin extends Plugin {
 
   /**
    * Loads plugin settings from Obsidian's data storage.
+   * Performs migration and validation for array settings.
    */
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const savedData = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, savedData);
+
+    // Ensure arrays exist and have valid values (migration from older versions)
+    this.validateArraySetting('platforms', DEFAULT_SETTINGS.platforms);
+    this.validateArraySetting('priorities', DEFAULT_SETTINGS.priorities);
+    this.validateArraySetting('noteTags', DEFAULT_SETTINGS.noteTags);
+
+    // Ensure defaults exist in their respective lists
+    this.validateDefaultInList('defaultPlatform', this.settings.platforms);
+    this.validateDefaultInList('defaultPriority', this.settings.priorities);
+  }
+
+  /**
+   * Validates an array setting, resetting to defaults if empty or invalid.
+   * @param key - The settings key to validate
+   * @param defaultValue - The default array value to use if invalid
+   */
+  private validateArraySetting(
+    key: 'platforms' | 'priorities' | 'noteTags',
+    defaultValue: string[]
+  ): void {
+    const value = this.settings[key];
+    if (!Array.isArray(value) || value.length === 0) {
+      this.settings[key] = [...defaultValue];
+    }
+  }
+
+  /**
+   * Validates that a default value exists in its corresponding list.
+   * @param defaultKey - The default setting key to validate
+   * @param list - The list of valid values
+   */
+  private validateDefaultInList(
+    defaultKey: 'defaultPlatform' | 'defaultPriority',
+    list: string[]
+  ): void {
+    if (list.length > 0 && !list.includes(this.settings[defaultKey])) {
+      this.settings[defaultKey] = list[0];
+    }
   }
 
   /**
@@ -120,8 +164,7 @@ export default class GameBacklogPlugin extends Plugin {
       this.igdbClient,
       this.hltbClient,
       this.steamGridDbClient,
-      this.settings.defaultPlatform as Platform,
-      this.settings.defaultPriority as Priority,
+      this.settings,
       (data: GameData) => {
         void this.createGameNote(data);
       }
@@ -134,8 +177,13 @@ export default class GameBacklogPlugin extends Plugin {
    * @param data - The game data to create a note for
    */
   private async createGameNote(data: GameData) {
-    const fileName = generateFileName(data.title);
-    const content = generateGameNote(data);
+    const noteOptions: NoteOptions = {
+      enableEfficiency: this.settings.enableEfficiency,
+      tags: this.settings.noteTags,
+      emojiPrefix: this.settings.noteEmojiPrefix,
+    };
+    const fileName = generateFileName(data.title, noteOptions.emojiPrefix);
+    const content = generateGameNote(data, noteOptions);
 
     // Check if file already exists
     const existingFile = this.app.vault.getAbstractFileByPath(fileName);
@@ -164,7 +212,7 @@ export default class GameBacklogPlugin extends Plugin {
    * Opens or creates the backlog dashboard file.
    */
   private async openBacklogDashboard() {
-    const dashboardPath = 'Video Game Backlog.md';
+    const dashboardPath = this.settings.dashboardPath;
     let file = this.app.vault.getAbstractFileByPath(dashboardPath);
 
     if (!file) {
@@ -185,6 +233,25 @@ export default class GameBacklogPlugin extends Plugin {
    * @returns The markdown content for the dashboard
    */
   private generateBacklogDashboard(): string {
+    const { upNextLimit, enableEfficiency } = this.settings;
+    const sortField = enableEfficiency ? 'efficiency' : 'rating';
+    const upNextTitle = enableEfficiency ? 'Up Next (Best Value)' : 'Up Next';
+    const upNextDesc = enableEfficiency
+      ? '*Highest rated games you can finish quickly*'
+      : '*Highest rated games*';
+
+    // Build Up Next table columns based on efficiency setting
+    const upNextColumns = enableEfficiency
+      ? `  link(file.link, title) AS "Game",
+  rating AS "Rating",
+  hltb_hours + "h" AS "Time",
+  efficiency AS "Value",
+  platform AS "On"`
+      : `  link(file.link, title) AS "Game",
+  rating AS "Rating",
+  hltb_hours + "h" AS "Time",
+  platform AS "On"`;
+
     return `---
 tags:
   - dashboard
@@ -219,21 +286,17 @@ WHERE priority = "Playing"
 
 ---
 
-## Up Next (Best Value)
+## ${upNextTitle}
 
-*Highest rated games you can finish quickly*
+${upNextDesc}
 
 \`\`\`dataview
 TABLE WITHOUT ID
-  link(file.link, title) AS "Game",
-  rating AS "Rating",
-  hltb_hours + "h" AS "Time",
-  efficiency AS "Value",
-  platform AS "On"
+${upNextColumns}
 FROM #game
 WHERE priority = "Must Play"
-SORT efficiency DESC
-LIMIT 5
+SORT ${sortField} DESC
+LIMIT ${upNextLimit}
 \`\`\`
 
 ---
@@ -245,7 +308,7 @@ LIMIT 5
 LIST WITHOUT ID link(file.link, title) + " — " + rating + "/100, " + hltb_hours + "h (" + platform + ")"
 FROM #game
 WHERE priority = "Must Play"
-SORT efficiency DESC
+SORT ${sortField} DESC
 \`\`\`
 
 ### Eventually
@@ -253,7 +316,7 @@ SORT efficiency DESC
 LIST WITHOUT ID link(file.link, title) + " — " + hltb_hours + "h (" + platform + ")"
 FROM #game
 WHERE priority = "Will Get Around To"
-SORT efficiency DESC
+SORT ${sortField} DESC
 \`\`\`
 
 ---
@@ -285,30 +348,43 @@ SORT file.mtime DESC
     // Create a simple modal to select new status
     const { Modal, Setting } = await import('obsidian');
 
+    const priorities = this.settings.priorities;
+
+    /**
+     * Callback interface for status updates.
+     */
+    interface StatusCallback {
+      /**
+       * Called when the user selects a new status.
+       * @param priority - The selected priority value
+       */
+      (priority: string): void;
+    }
+
     /**
      * Modal for updating game status.
      */
     class StatusModal extends Modal {
       private newPriority: string;
-      /** Callback function for when status is updated */
-      private onSubmit: (priority: string) => void;
+      private priorities: string[];
+      private onSubmit: StatusCallback;
 
       /**
        * Creates a modal for updating game status.
        * @param app - Obsidian app instance
        * @param priority - Initial priority value
+       * @param priorities - Available priority options from settings
        * @param onSubmit - Callback when status is updated
        */
       constructor(
         app: App,
         priority: string,
-        onSubmit: /**
-         *
-         */
-        (priority: string) => void
+        priorities: string[],
+        onSubmit: StatusCallback
       ) {
         super(app);
         this.newPriority = priority;
+        this.priorities = priorities;
         this.onSubmit = onSubmit;
       }
 
@@ -320,14 +396,7 @@ SORT file.mtime DESC
         contentEl.createEl('h2', { text: 'Update game status' });
 
         new Setting(contentEl).setName('Status').addDropdown((dropdown) => {
-          const priorities = [
-            'Must Play',
-            'Will Get Around To',
-            'Playing',
-            'Completed',
-            'Dropped',
-          ];
-          priorities.forEach((p) => dropdown.addOption(p, p));
+          this.priorities.forEach((p) => dropdown.addOption(p, p));
           dropdown.setValue(this.newPriority);
           dropdown.onChange((value) => {
             this.newPriority = value;
@@ -354,7 +423,7 @@ SORT file.mtime DESC
       }
     }
 
-    const modal = new StatusModal(this.app, initialPriority, (priority) => {
+    const modal = new StatusModal(this.app, initialPriority, priorities, (priority) => {
       // Update the frontmatter using processFrontMatter for atomic updates
       void this.app.fileManager.processFrontMatter(file, (frontmatter) => {
         frontmatter.priority = priority;

@@ -106,3 +106,30 @@
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
+/* Settings list styles */
+.game-backlog-list-container {
+  margin-bottom: var(--size-4-4);
+}
+
+.game-backlog-list-container .setting-item {
+  border-top: none;
+  padding-top: var(--size-4-1);
+  padding-bottom: var(--size-4-1);
+}
+
+.game-backlog-list-item {
+  padding-top: var(--size-4-2) !important;
+  padding-bottom: var(--size-4-2) !important;
+}
+
+.game-backlog-list-item .setting-item-control {
+  flex-grow: 1;
+  justify-content: flex-start;
+  gap: var(--size-4-2);
+}
+
+.game-backlog-list-input {
+  flex-grow: 1;
+  width: 100%;
+}
