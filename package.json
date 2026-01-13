@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "obsidian-game-backlog",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Video game backlog manager for Obsidian with IGDB, HLTB, and SteamGridDB integration",
   "main": "main.js",
   "lint-staged": {
